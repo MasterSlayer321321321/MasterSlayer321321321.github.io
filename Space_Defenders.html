@@ -60,9 +60,9 @@
 
     function moveShip(event) {
       if (event.key === "ArrowLeft" && shipX > 25) {
-        shipX -= 5;
+        shipX -= 10;
       } else if (event.key === "ArrowRight" && shipX < canvas.width - 25) {
-        shipX += 5;
+        shipX += 10;
       } else if (event.key === " ") {
         shootBullet();
       } else if (event.key === "r") {
@@ -106,7 +106,6 @@
       }
     }
 
-    function reset
     function resetAsteroid() {
       asteroidX = Math.random() * canvas.width;
       asteroidY = 0;
