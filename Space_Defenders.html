@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Space Defenders</title>
+  <style>
+    #gameCanvas {
+      background-color: #000000;
+      display: block;
+      margin: 0 auto;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="gameCanvas" width="600" height="400"></canvas>
+
+  <script>
+    // Space Defenders Game
+
+    // Canvas Setup
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    // Game Variables
+    let shipX = canvas.width / 2;
+    const shipY = canvas.height - 80;
+    let asteroidX = Math.random() * canvas.width;
+    let asteroidY = 0;
+    let bullets = [];
+    let score = 0;
+    let lives = 3;
+    let gameOver = false;
+
+    // Event Listeners
+    document.addEventListener("keydown", handleKeyPress);
+
+    // Functions
+    function drawShip() {
+      const shipImage = new Image();
+      shipImage.src = "Retrospaceship.png"; // Replace with the actual path to the spaceship image
+      ctx.drawImage(shipImage, shipX - 25, shipY, 50, 50);
+    }
+
+    function drawAsteroid() {
+      ctx.beginPath();
+      ctx.arc(asteroidX, asteroidY, 20, 0, Math.PI * 2);
+      ctx.fillStyle = "#ff0000";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawBullets() {
+      bullets.forEach((bullet) => {
+        ctx.beginPath();
+        ctx.rect(bullet.x - 2.5, bullet.y - 10, 5, 10);
+        ctx.fillStyle = "#ffff00";
+        ctx.fill();
+        ctx.closePath();
+      });
+    }
+
+    function moveShip(event) {
+      if (event.key === "ArrowLeft" && shipX > 25) {
+        shipX -= 5;
+      } else if (event.key === "ArrowRight" && shipX < canvas.width - 25) {
+        shipX += 5;
+      } else if (event.key === " ") {
+        shootBullet();
+      } else if (event.key === "r") {
+        resetGame();
+      }
+    }
+
+    function shootBullet() {
+      bullets.push({ x: shipX, y: shipY });
+    }
+
+    function updateBullets() {
+      bullets = bullets.filter((bullet) => bullet.y > 0);
+
+      bullets.forEach((bullet) => {
+        bullet.y -= 5;
+      });
+    }
+
+    function collisionDetection() {
+      bullets.forEach((bullet) => {
+        const distance = Math.sqrt(
+          Math.pow(asteroidX - bullet.x, 2) + Math.pow(asteroidY - bullet.y, 2)
+        );
+        if (distance < 20) {
+          score++;
+          resetAsteroid();
+        }
+      });
+
+      const distance = Math.sqrt(
+        Math.pow(asteroidX - shipX, 2) + Math.pow(asteroidY - shipY, 2)
+      );
+      if (distance < 45) {
+        lives--;
+        if (lives === 0) {
+          gameOver = true;
+        } else {
+          resetShipPosition();
+        }
+      }
+    }
+
+    function reset
+    function resetAsteroid() {
+      asteroidX = Math.random() * canvas.width;
+      asteroidY = 0;
+    }
+
+    function resetShipPosition() {
+      shipX = canvas.width / 2;
+    }
+
+    function updateScore() {
+      ctx.font = "20px Arial";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("Score: " + score, 10, 30);
+    }
+
+    function updateLives() {
+      ctx.font = "20px Arial";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText("Lives: " + lives, canvas.width - 100, 30);
+    }
+
+    function update() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      if (!gameOver) {
+        drawShip();
+        drawAsteroid();
+        drawBullets();
+
+        updateBullets();
+        asteroidY += 1;
+
+        if (asteroidY > canvas.height) {
+          resetAsteroid();
+        }
+
+        collisionDetection();
+        updateScore();
+        updateLives();
+
+        requestAnimationFrame(update);
+      } else {
+        ctx.font = "30px Arial";
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText("Game Over", canvas.width / 2 - 80, canvas.height / 2);
+      }
+    }
+
+    function handleKeyPress(event) {
+      if (event.key === "ArrowLeft" || event.key === "ArrowRight" || event.key === " ") {
+        event.preventDefault();
+      }
+      moveShip(event);
+    }
+
+    function resetGame() {
+      shipX = canvas.width / 2;
+      asteroidX = Math.random() * canvas.width;
+      asteroidY = 0;
+      bullets = [];
+      score = 0;
+      lives = 3;
+      gameOver = false;
+      update();
+    }
+
+    // Start the Game
+    update();
+  </script>
+</body>
+</html>
